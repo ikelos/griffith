@@ -24,7 +24,6 @@ __revision__ = '$Id$'
 import logging
 import os
 import string
-import sys
 import tempfile
 import threading
 import time
@@ -76,7 +75,7 @@ class Movie(object):
     progress = None
     useurllib2 = False
 
-    # functions that plugin should implement: {{{
+    # functions that plugin should implement
     def initialize(self):
         pass
 
@@ -142,7 +141,6 @@ class Movie(object):
 
     def get_year(self):
         pass
-    #}}}
 
     def __getitem__(self, key):
         return getattr(self, key)
@@ -228,7 +226,8 @@ class Movie(object):
             dest = "%s.jpg" % tmp_dest
             try:
                 self.progress.set_data(self.parent_window, _("Fetching poster"), _("Wait a moment"), False)
-                retriever = Retriever(self.image_url, self.parent_window, self.progress, dest, useurllib2=self.useurllib2)
+                retriever = Retriever(self.image_url, self.parent_window, self.progress, dest,
+                                      useurllib2=self.useurllib2)
                 retriever.start()
                 while retriever.isAlive():
                     self.progress.pulse()
@@ -293,13 +292,6 @@ class Movie(object):
                 self[i] = gutils.clean(self[i])
                 if not isinstance(self[i], unicode):
                     self[i] = gutils.gdecode(self[i], self.encode)
-
-            if 'o_title' in self.fields_to_fetch and self.o_title is not None:
-                if self.o_title[:4] == u'The ':
-                    self.o_title = self.o_title[4:] + u', The'
-            if 'title' in self.fields_to_fetch and self.title is not None:
-                if self.title[:4] == u'The ':
-                    self.title = self.title[4:] + u', The'
         except:
             log.exception('')
         finally:
@@ -324,6 +316,9 @@ class SearchMovie(object):
     usepostrequest = False
 
     def __init__(self):
+        pass
+
+    def search(self, parent_window):
         pass
 
     def search_movies(self, parent_window):
@@ -358,7 +353,8 @@ class SearchMovie(object):
         self.progress.set_data(parent_window, _("Searching"), _("Wait a moment"), True)
         if self.usepostrequest:
             postdata = self.get_postdata()
-            retriever = Retriever(url, parent_window, self.progress, destination, useurllib2=self.useurllib2, postdata=postdata)
+            retriever = Retriever(url, parent_window, self.progress, destination, useurllib2=self.useurllib2,
+                                  postdata=postdata)
         else:
             retriever = Retriever(url, parent_window, self.progress, destination, useurllib2=self.useurllib2)
         retriever.start()
@@ -398,14 +394,13 @@ class SearchMovie(object):
     
     def get_postdata(self):
         # sample, depends on target site
-        #return {'title' : self.Title, 'category' : 'movieTitel' }
         return {}
 
 
 class Retriever(threading.Thread):
 
-    def __init__(self, URL, parent_window, progress, destination=None, useurllib2=False, postdata=None):
-        self.URL = URL
+    def __init__(self, url, parent_window, progress, destination=None, useurllib2=False, postdata=None):
+        self.URL = url
         self.html = None
         self.exception = None
         self.destination = destination
@@ -437,16 +432,17 @@ class Retriever(threading.Thread):
             self.exception = e
 
     def hook(self, count, blockSize, totalSize):
-        if totalSize == -1:
-            pass
-        else:
-            try:
-                downloaded_percentage = min((count * blockSize * 100) / totalSize, 100)
-            except:
-                downloaded_percentage = 100
-            if count != 0:
-                downloaded_kbyte = int(count * blockSize / 1024.0)
-                filesize_kbyte = int(totalSize / 1024.0)
+        # if totalSize == -1:
+        #     pass
+        # else:
+        #     try:
+        #         downloaded_percentage = min((count * blockSize * 100) / totalSize, 100)
+        #     except:
+        #         downloaded_percentage = 100
+        #     if count != 0:
+        #         downloaded_kbyte = int(count * blockSize / 1024.0)
+        #         filesize_kbyte = int(totalSize / 1024.0)
+        pass
 
 #
 # use own derived URLopener class because we need to set a correct User-Agent
@@ -467,8 +463,6 @@ def urlretrieve(url, filename=None, reporthook=None, data=None):
 def urlretrieve2(url, filename=None, reporthook=None, data=None):
     global _tempfilecleanup
     headers = {
-        #'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0; MSAppHost/1.0)',
-        #'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.2.2; Nexus 4 Build/JDQ39E)'
         'User-Agent': 'Dalvik/1.2.0 (Linux; U; Android 2.2.2; Huawei U8800-51 Build/HWU8800B635)',
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
@@ -562,7 +556,6 @@ class Progress:
         self.dialog.hide()
 
     def set_data(self, parent_window, title, message, showit):
-        #self.dialog.set_parent(parent_window)
         self.dialog.set_title(title)
         self.label.set_markup(message)
         if showit is True:

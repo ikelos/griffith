@@ -21,22 +21,26 @@ __revision__ = '$Id$'
 # You may use and distribute this software under the terms of the
 # GNU General Public License, version 2 or later
 
-import gutils, movie
-import string, re
+import gutils
+import movie
+import string
+import re
 
-plugin_name         = 'IMDb'
-plugin_description  = 'Internet Movie Database'
-plugin_url          = 'www.imdb.com'
-plugin_language     = _('English')
-plugin_author       = 'Vasco Nunes, Piotr Ożarowski'
+plugin_name = 'IMDb'
+plugin_description = 'Internet Movie Database'
+plugin_url = 'www.imdb.com'
+plugin_language = _('English')
+plugin_author = 'Vasco Nunes, Piotr Ożarowski'
 plugin_author_email = 'griffith@griffith.cc'
-plugin_version      = '1.15'
+plugin_version = '1.15'
+
 
 class Plugin(movie.Movie):
-    def __init__(self, id):
-        self.encode   = 'utf-8'
-        self.movie_id = id
-        self.url      = "http://imdb.com/title/tt%s" % self.movie_id
+
+    def __init__(self, movie_id):
+        self.encode = 'utf-8'
+        self.movie_id = movie_id
+        self.url = "http://imdb.com/title/tt%s" % self.movie_id
 
     def initialize(self):
         self.cast_page = self.open_page(url=self.url + '/fullcredits')
@@ -80,8 +84,8 @@ class Plugin(movie.Movie):
             self.plot = self.plot + '\n\n'
             elements[0] = ''
             for element in elements[1:]:
-                if element <> '':
-                    self.plot = self.plot + gutils.strip_tags(gutils.before(element, '</a>')) + '\n\n'
+                if element != '':
+                    self.plot += gutils.strip_tags(gutils.before(element, '</a>')) + '\n\n'
 
     def get_year(self):
         self.year = gutils.trim(self.page, '<a href="/year/', '</a>')
@@ -121,7 +125,7 @@ class Plugin(movie.Movie):
         self.studio = ''
         tmp = gutils.regextrim(self.comp_page, 'name="production"', '</ul>')
         tmp = string.split(tmp, 'href="')
-        if len(tmp)>1:
+        if len(tmp) > 1:
             for entry in tmp[1:]:
                 entry = string.strip(string.replace(gutils.trim(entry, '>', '<'), '\n', ''))
                 if entry:
@@ -150,7 +154,7 @@ class Plugin(movie.Movie):
             if self.rating:
                 try:
                     self.rating = round(float(self.rating), 0)
-                except Exception, e:
+                except Exception:
                     self.rating = 0
         else:
             self.rating = 0
@@ -175,19 +179,19 @@ class Plugin(movie.Movie):
         tagline = gutils.regextrim(self.tagl_page, '>Taglines', '>See also')
         taglines = re.split('<div[^>]+class="soda[^>]*>', tagline)
         tagline = ''
-        if len(taglines)>1:
+        if len(taglines) > 1:
             for entry in taglines[1:]:
                 entry = gutils.clean(gutils.before(entry, '</div>'))
                 if entry:
                     tagline = tagline + entry + '\n'
-        if len(language)>0:
-            self.notes = "%s: %s\n" %(_('Language'), language)
-        if len(sound)>0:
-            self.notes += "%s: %s\n" %(gutils.strip_tags(_('<b>Audio</b>')), sound)
-        if len(color)>0:
-            self.notes += "%s: %s\n" %(_('Color'), color)
-        if len(tagline)>0:
-            self.notes += "%s: %s\n" %('Tagline', tagline)
+        if len(language) > 0:
+            self.notes = "%s: %s\n" % (_('Language'), language)
+        if len(sound) > 0:
+            self.notes += "%s: %s\n" % (gutils.strip_tags(_('<b>Audio</b>')), sound)
+        if len(color) > 0:
+            self.notes += "%s: %s\n" % (_('Color'), color)
+        if len(tagline) > 0:
+            self.notes += "%s: %s\n" % ('Tagline', tagline)
 
     def get_screenplay(self):
         self.screenplay = ''
@@ -219,9 +223,10 @@ class Plugin(movie.Movie):
     def __before_more(self, data):
         for element in ['>See more<', '>more<', '>Full summary<', '>Full synopsis<']:
             tmp = string.find(data, element)
-            if tmp>0:
+            if tmp > 0:
                 data = data[:tmp] + '>'
         return data
+
 
 class SearchPlugin(movie.SearchMovie):
     PATTERN = re.compile(r"""<a href=['"]/title/tt([0-9]+)/[^>]+[>](.*?)</td>""")
@@ -235,11 +240,11 @@ class SearchPlugin(movie.SearchMovie):
         # finds a whole bunch of results. if you look for "Rocky" you will get 903 results.
         # http://www.imdb.com/find?s=tt;q=
         # seems to give the best results. 88 results for "Rocky", popular titles first.
-        self.original_url_search   = 'http://www.imdb.com/find?s=tt&q='
+        self.original_url_search = 'http://www.imdb.com/find?s=tt&q='
         self.translated_url_search = 'http://www.imdb.com/find?s=tt&q='
-        self.encode                = 'utf8'
+        self.encode = 'utf8'
 
-    def search(self,parent_window):
+    def search(self, parent_window):
         if not self.open_search(parent_window):
             return None
         return self.page
@@ -273,11 +278,12 @@ class SearchPluginTest(SearchPlugin):
     # dict { movie_id -> [ expected result count for original url, expected result count for translated url ] }
     #
     test_configuration = {
-        'Rocky Balboa'         : [ 10, 10 ],
-        'Ein glückliches Jahr' : [ 3, 3 ]
+        'Rocky Balboa': [8, 8],
+        'Ein glückliches Jahr': [2, 2]
     }
 
-class PluginTest:
+
+class PluginTest(object):
     #
     # Configuration for automated tests:
     # dict { movie_id -> dict { arribute -> value } }
@@ -286,85 +292,29 @@ class PluginTest:
     #        * or the expected value
     #
     test_configuration = {
-        '0138097' : {
-            'title'             : 'Shakespeare in Love',
-            'o_title'           : 'Shakespeare in Love',
-            'director'          : 'John Madden',
-            'plot'              : True,
-            'cast'              : 'Geoffrey Rush' + _(' as ') + 'Philip Henslowe\n\
-Tom Wilkinson' + _(' as ') + 'Hugh Fennyman\n\
-Steven O\'Donnell' + _(' as ') + 'Lambert\n\
-Tim McMullan' + _(' as ') + 'Frees (as Tim McMullen)\n\
-Joseph Fiennes' + _(' as ') + 'Will Shakespeare\n\
-Steven Beard' + _(' as ') + 'Makepeace - the Preacher\n\
-Antony Sher' + _(' as ') + 'Dr. Moth\n\
-Patrick Barlow' + _(' as ') + 'Will Kempe\n\
-Martin Clunes' + _(' as ') + 'Richard Burbage\n\
-Sandra Reinton' + _(' as ') + 'Rosaline\n\
-Simon Callow' + _(' as ') + 'Tilney - Master of the Revels\n\
-Judi Dench' + _(' as ') + 'Queen Elizabeth\n\
-Bridget McConnell' + _(' as ') + 'Lady in Waiting (as Bridget McConnel)\n\
-Georgie Glen' + _(' as ') + 'Lady in Waiting\n\
-Nicholas Boulton' + _(' as ') + 'Henry Condell\n\
-Gwyneth Paltrow' + _(' as ') + 'Viola De Lesseps\n\
-Imelda Staunton' + _(' as ') + 'Nurse\n\
-Colin Firth' + _(' as ') + 'Lord Wessex\n\
-Desmond McNamara' + _(' as ') + 'Crier\n\
-Barnaby Kay' + _(' as ') + 'Nol\n\
-Jim Carter' + _(' as ') + 'Ralph Bashford\n\
-Paul Bigley' + _(' as ') + 'Peter - the Stage Manager\n\
-Jason Round' + _(' as ') + 'Actor in Tavern\n\
-Rupert Farley' + _(' as ') + 'Barman\n\
-Adam Barker' + _(' as ') + 'First Auditionee\n\
-Joe Roberts' + _(' as ') + 'John Webster\n\
-Harry Gostelow' + _(' as ') + 'Second Auditionee\n\
-Alan Cody' + _(' as ') + 'Third Auditionee\n\
-Mark Williams' + _(' as ') + 'Wabash\n\
-David Curtiz' + _(' as ') + 'John Hemmings\n\
-Gregor Truter' + _(' as ') + 'James Hemmings\n\
-Simon Day' + _(' as ') + 'First Boatman\n\
-Jill Baker' + _(' as ') + 'Lady De Lesseps\n\
-Amber Glossop' + _(' as ') + 'Scullery Maid\n\
-Robin Davies' + _(' as ') + 'Master Plum\n\
-Hywel Simons' + _(' as ') + 'Servant\n\
-Nicholas Le Prevost' + _(' as ') + 'Sir Robert De Lesseps\n\
-Ben Affleck' + _(' as ') + 'Ned Alleyn\n\
-Timothy Kightley' + _(' as ') + 'Edward Pope\n\
-Mark Saban' + _(' as ') + 'Augustine Philips\n\
-Bob Barrett' + _(' as ') + 'George Bryan\n\
-Roger Morlidge' + _(' as ') + 'James Armitage\n\
-Daniel Brocklebank' + _(' as ') + 'Sam Gosse\n\
-Roger Frost' + _(' as ') + 'Second Boatman\n\
-Rebecca Charles' + _(' as ') + 'Chambermaid\n\
-Richard Gold' + _(' as ') + 'Lord in Waiting\n\
-Rachel Clarke' + _(' as ') + 'First Whore\n\
-Lucy Speed' + _(' as ') + 'Second Whore\n\
-Patricia Potter' + _(' as ') + 'Third Whore\n\
-John Ramm' + _(' as ') + 'Makepeace\'s Neighbor\n\
-Martin Neely' + _(' as ') + 'Paris / Lady Montague (as Martin Neeley)\n\
-The Choir of St. George\'s School in Windsor' + _(' as ') + 'Choir (as The Choir of St. George\'s School Windsor) rest of cast listed alphabetically:\n\
-Jason Canning' + _(' as ') + 'Nobleman (uncredited)\n\
-Kelley Costigan' + _(' as ') + 'Theatregoer (uncredited)\n\
-Rupert Everett' + _(' as ') + 'Christopher Marlowe (uncredited)\n\
-John Inman' + _(' as ') + 'Character Player (uncredited)',
-            'country'           : 'USA',
-            'genre'             : 'Comedy | Drama | Romance',
-            'classification'    : False,
-            'studio'            : 'Universal Pictures, Miramax Films, Bedford Falls Productions',
-            'o_site'            : False,
-            'site'              : 'http://www.imdb.com/title/tt0138097',
-            'trailer'           : 'http://www.imdb.com/title/tt0138097/trailers',
-            'year'              : 1998,
-            'notes'             : _('Language') + ': English\n'\
-+ _('Audio') + ': Dolby Digital\n'\
-+ _('Color') + ': Color\n\
+        '0138097': {
+            'title': 'Shakespeare in Love',
+            'o_title': 'Shakespeare in Love',
+            'director': 'John Madden',
+            'plot': True,
+            'country': 'USA',
+            'genre': 'Comedy | Drama | Romance',
+            'classification': False,
+            'studio': 'Universal Pictures, Miramax Films, Bedford Falls Productions',
+            'o_site': False,
+            'site': 'http://www.imdb.com/title/tt0138097',
+            'trailer': 'http://www.imdb.com/title/tt0138097/trailers',
+            'year': 1998,
+            'notes': _('Language') + ': English\n' \
+                     + _('Audio') + ': Dolby Digital\n' \
+                     + _('Color') + ': Color\n\
 Tagline: ...A Comedy About the Greatest Love Story Almost Never Told...\n\
 Love is the only inspiration',
-            'runtime'           : 123,
-            'image'             : True,
-            'rating'            : 7,
-            'screenplay'        : 'Marc Norman, Tom Stoppard',
-            'cameraman'         : 'Richard Greatrex',
-            'barcode'           : False
+            'runtime': 123,
+            'image': True,
+            'rating': 7,
+            'screenplay': 'Marc Norman, Tom Stoppard',
+            'cameraman': 'Richard Greatrex',
+            'barcode': False
         },
     }

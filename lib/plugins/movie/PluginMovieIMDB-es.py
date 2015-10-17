@@ -26,18 +26,20 @@ import movie
 import string
 import re
 
-plugin_name         = 'IMDb-es'
-plugin_description  = 'Internet Movie Database Spanish'
-plugin_url          = 'www.imdb.es'
-plugin_language     = _('Spanish')
-plugin_author       = 'Pedro D. Sánchez'
+plugin_name = 'IMDb-es'
+plugin_description = 'Internet Movie Database Spanish'
+plugin_url = 'www.imdb.es'
+plugin_language = _('Spanish')
+plugin_author = 'Pedro D. Sánchez'
 plugin_author_email = '<pedrodav@gmail.com>'
-plugin_version      = '0.4'
+plugin_version = '0.4'
+
 
 class Plugin(movie.Movie):
-    def __init__(self, id):
-        self.encode='iso-8859-15'
-        self.movie_id = id
+
+    def __init__(self, movie_id):
+        self.encode = 'iso-8859-15'
+        self.movie_id = movie_id
         self.url = "http://www.imdb.es/title/tt%s" % str(self.movie_id)
 
     def initialize(self):
@@ -262,96 +264,6 @@ class PluginTest:
             'o_title'           : 'Rocky Balboa',
             'director'          : 'Sylvester Stallone',
             'plot'              : True,
-            'cast'              : 'Sylvester Stallone' + _(' as ') + 'Rocky Balboa\n\
-Burt Young' + _(' as ') + 'Paulie\n\
-Antonio Tarver' + _(' as ') + 'Mason \'The Line\' Dixon\n\
-Geraldine Hughes' + _(' as ') + 'Marie\n\
-Milo Ventimiglia' + _(' as ') + 'Robert Balboa Jr.\n\
-Tony Burton' + _(' as ') + 'Duke\n\
-A.J. Benza' + _(' as ') + 'L.C.\n\
-James Francis Kelly III' + _(' as ') + 'Steps\n\
-Talia Shire' + _(' as ') + 'Adrian (tomas de archivo)\n\
-Lou DiBella' + _(' as ') + u'Él Mismo\n\
-Mike Tyson' + _(' as ') + u'Él Mismo\n\
-Henry G. Sanders' + _(' as ') + 'Martin\n\
-Pedro Lovell' + _(' as ') + 'Spider Rico\n\
-Ana Gerena' + _(' as ') + 'Isabel\n\
-Angela Boyd' + _(' as ') + 'Angie\n\
-Louis Giansante' + _(' as ') + 'Bar Thug\n\
-Maureen Schilling' + _(' as ') + 'Lucky\'s Bartender\n\
-Lahmard J. Tate' + _(' as ') + 'X-Cell (como Lahmard Tate)\n\
-Woody Paige' + _(' as ') + 'ESPN Commentator (como Woodrow W. Paige)\n\
-Skip Bayless' + _(' as ') + 'ESPN Commentator\n\
-Jay Crawford' + _(' as ') + 'ESPN Commentator\n\
-Brian Kenny' + _(' as ') + 'ESPN Host\n\
-Dana Jacobson' + _(' as ') + 'ESPN Host\n\
-Charles Johnson' + _(' as ') + 'ESPN Host (como Chuck Johnson)\n\
-James Binns' + _(' as ') + 'Commissioner (como James J. Binns)\n\
-Johnnie Hobbs Jr.' + _(' as ') + 'Commissioner\n\
-Barney Fitzpatrick' + _(' as ') + 'Commissioner\n\
-Jim Lampley' + _(' as ') + 'HBO Commentator\n\
-Larry Merchant' + _(' as ') + 'HBO Commentator\n\
-Max Kellerman' + _(' as ') + 'HBO Commentator\n\
-LeRoy Neiman' + _(' as ') + u'Él Mismo\n\
-Bert Randolph Sugar' + _(' as ') + u'Ring Magazine Reporter\n\
-Bernard Fernández' + _(' as ') + 'Boxing Association of America Writer (como Bernard Fernandez)\n\
-Gunnar Peterson' + _(' as ') + 'Weightlifting Trainer\n\
-Yahya' + _(' as ') + 'Dixon\'s Opponent\n\
-Marc Ratner' + _(' as ') + 'Weigh-In Official\n\
-Anthony Lato Jr.' + _(' as ') + 'Rocky\'s Inspector\n\
-Jack Lazzarado' + _(' as ') + 'Dixon\'s Inspector\n\
-Michael Buffer' + _(' as ') + 'Ring Announcer\n\
-Joe Cortez' + _(' as ') + u'Árbitro\n\
-Carter Mitchell' + _(' as ') + 'Shamrock Foreman\n\
-Vinod Kumar' + _(' as ') + 'Ravi\n\
-Fran Pultro' + _(' as ') + 'Father at Restaurant\n\
-Frank Stallone' + _(' as ') + 'Dinner Patron (como Frank Stallone Jr.)\n\
-Jody Giambelluca' + _(' as ') + 'Dinner Patron\n\
-Tobias Segal' + _(' as ') + 'Robert\'s Friend\n\
-Tim Carr' + _(' as ') + 'Robert\'s Friend\n\
-Matt Frack' + _(' as ') + 'Robert\'s Friend #3\n\
-Paul Dion Monte' + _(' as ') + 'Robert\'s Friend\n\
-Kevin King Templeton' + _(' as ') + 'Robert\'s Friend (como Kevin King-Templeton)\n\
-Robert Michael Kelly' + _(' as ') + 'Mr. Tomilson\n\
-Rick Buchborn' + _(' as ') + 'Rocky Fan\n\
-Nick Baker' + _(' as ') + 'Irish Pub Bartender\n\
-Don Sherman' + _(' as ') + 'Andy\n\
-Stu Nahan' + _(' as ') + 'Computer Fight Commentator (voz)\n\
-Gary Compton' + _(' as ') + u'Oficial de Seguridad listado alfabético del resto del reparto:\n\
-Vale Anoai' + _(' as ') + 'Shopper in Italian Market\n\
-Sikander Malik' + _(' as ') + 'Boxer\n\
-Michael Ahl' + _(' as ') + 'Restaurant Patron (sin acreditar)\n\
-Andrew Aninsman' + _(' as ') + 'Promoter (sin acreditar)\n\
-Ben Bachelder' + _(' as ') + 'The Arm (sin acreditar)\n\
-Lacy Bevis' + _(' as ') + 'Boxing Spectator (sin acreditar)\n\
-Tim Brooks' + _(' as ') + 'Boxing Spectator (sin acreditar)\n\
-D.T. Carney' + _(' as ') + 'High Roller (sin acreditar)\n\
-Ricky Cavazos' + _(' as ') + 'Boxing Spectator (sin acreditar)\n\
-Rennie Cowan' + _(' as ') + 'Boxing Spectator (sin acreditar)\n\
-Kevin Deon' + _(' as ') + 'Jeno (sin acreditar)\n\
-Deon Derrico' + _(' as ') + 'High Roller at Limo (sin acreditar)\n\
-Jacob \'Stitch\' Duran' + _(' as ') + 'Dixon\'s Trainer (sin acreditar)\n\
-Simon P. Edwards' + _(' as ') + 'Crowd Member (sin acreditar)\n\
-Ruben Fischman' + _(' as ') + 'High-Roller in Las Vegas (sin acreditar)\n\
-David Gere' + _(' as ') + 'Patron at Adrian\'s (sin acreditar)\n\
-Noah Jacobs' + _(' as ') + 'Boxing Fan (sin acreditar)\n\
-Mark J. Kilbane' + _(' as ') + 'Businessman (sin acreditar)\n\
-Zach Klinefelter' + _(' as ') + 'Boxing Spectator (sin acreditar)\n\
-David Kneeream' + _(' as ') + 'Adrian\'s Patron (sin acreditar)\n\
-Dolph Lundgren' + _(' as ') + 'Captain Ivan Drago (tomas de archivo) (sin acreditar)\n\
-Dean Mauro' + _(' as ') + 'Sports Journalist (sin acreditar) (sin confirmar)\n\
-Burgess Meredith' + _(' as ') + 'Mickey Goldmill (tomas de archivo) (sin acreditar)\n\
-Dan Montero' + _(' as ') + 'Boxing Spectator (sin acreditar)\n\
-Babs Moran' + _(' as ') + 'Obnoxious Fan (sin acreditar)\n\
-Keith Moyer' + _(' as ') + 'Administrador del Bar (sin acreditar)\n\
-Mr. T' + _(' as ') + 'Clubber Lang (tomas de archivo) (sin acreditar)\n\
-Carol Anne Mueller' + _(' as ') + 'Restaurant Patron (sin acreditar)\n\
-Jacqueline Olivia' + _(' as ') + 'Chica (sin acreditar)\n\
-Brian H. Scott' + _(' as ') + 'Ringside Cop #1 (sin acreditar)\n\
-Keyon Smith' + _(' as ') + 'Boxing Spectator (sin acreditar)\n\
-Frank Traynor' + _(' as ') + 'Abogado (sin acreditar)\n\
-Ryan Tygh' + _(' as ') + 'Ring Photographer (sin acreditar)\n\
-Kimberly Villanova' + _(' as ') + 'Businesswoman (sin acreditar)',
             'country'           : 'Estados Unidos',
             'genre'             : u'Drama | Deporte',
             'classification'    : u'Estados Unidos:PG  | Singapur:PG  | Finlandia:K-11  | Reino Unido:12A  | Canadá:G (British Columbia) | Australia:M  | Irlanda:PG  | Hong Kong:IIA  | México:A  | Noruega:11  | Suiza:12 (canton of Vaud) | Suiza:12 (canton of Geneva) | Brasil:12  | Argentina:Atp  | Malasia:U  | Filipinas:PG-13 (MTRCB) | Portugal:M/12  | Corea del Sur:12  | Suecia:11  | Nueva Zelanda:M  | Italia:T  | Alemania:12  | Francia:U',
